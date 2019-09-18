@@ -8,6 +8,7 @@ local FFI_ERROR = base.FFI_ERROR
 local FFI_DONE = base.FFI_DONE
 local FFI_OK = base.FFI_OK
 local FFI_AGAIN = base.FFI_AGAIN
+local FFI_NO_REQ_CTX = base.FFI_NO_REQ_CTX
 local get_request = base.get_request
 local error = error
 local assert = assert
@@ -84,6 +85,10 @@ local function tlshandshake(self, options)
                                                    options.ocsp_status_req
                                                        and 1 or 0,
                                                    errmsg)
+
+    if rc == FFI_NO_REQ_CTX then
+        error("no request ctx found", 2)
+    end
 
 ::again::
 
