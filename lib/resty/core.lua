@@ -25,6 +25,7 @@ end
 
 require "resty.core.misc"
 require "resty.core.ctx"
+require "resty.core.socket_tcp"
 
 
 local base = require "resty.core.base"
