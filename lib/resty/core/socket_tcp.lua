@@ -20,7 +20,8 @@ local table_new = require("table.new")
 local table_clear = require("table.clear")
 
 ffi.cdef[[
-typedef struct ngx_http_lua_socket_tcp_upstream_s ngx_http_lua_socket_tcp_upstream_t;
+typedef struct ngx_http_lua_socket_tcp_upstream_s
+    ngx_http_lua_socket_tcp_upstream_t;
 
 int ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, void *sess,
