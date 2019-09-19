@@ -19,23 +19,18 @@ local co_yield = coroutine._yield
 local table_new = require("table.new")
 local table_clear = require("table.clear")
 
-if not pcall(ffi.typeof, "ngx_ssl_session_t") then
-    ffi.cdef[[
-        typedef struct SSL_SESSION ngx_ssl_session_t;
-    ]]
-end
-
 ffi.cdef[[
 typedef struct ngx_http_lua_socket_tcp_upstream_s ngx_http_lua_socket_tcp_upstream_t;
 
 int ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
-    ngx_http_lua_socket_tcp_upstream_t *u, ngx_ssl_session_t *sess,
+    ngx_http_lua_socket_tcp_upstream_t *u, void *sess,
     int enable_session_reuse, ngx_str_t *server_name, int verify,
-    int ocsp_status_req, char **errmsg);
+    int ocsp_status_req, void *chain, void *pkey,
+    char **errmsg);
 int ngx_http_lua_ffi_socket_tcp_get_tlshandshake_result(ngx_http_request_t *r,
-    ngx_http_lua_socket_tcp_upstream_t *u, ngx_ssl_session_t **sess,
+    ngx_http_lua_socket_tcp_upstream_t *u, void **sess,
     char **errmsg, int *openssl_error_code);
-void ngx_http_lua_ffi_tls_free_session(ngx_ssl_session_t *sess);
+void ngx_http_lua_ffi_tls_free_session(void *sess);
 ]]
 
 
@@ -43,7 +38,7 @@ local SOCKET_CTX_INDEX = 1
 
 
 local errmsg = base.get_errmsg_ptr()
-local session_ptr = ffi.new("ngx_ssl_session_t *[1]")
+local session_ptr = ffi.new("void *[1]")
 local server_name_str = ffi.new("ngx_str_t[1]")
 local openssl_error_code = ffi.new("int[1]")
 local cached_options = table_new(0, 4)
@@ -76,6 +71,21 @@ local function tlshandshake(self, options)
         server_name_str[0].len = 0
     end
 
+    local client_cert = options.client_cert
+    local client_priv_key = options.client_priv_key
+    if client_cert then
+        if not client_priv_key then
+            error("client certificate supplied without "
+                  .. "corresponding private key", 2)
+        end
+
+        if type(client_cert) ~= "cdata"
+           or type(client_priv_key) ~= "cdata"
+        then
+            error("wrong type of client certificate or private key supplied", 2)
+        end
+    end
+
     local rc =
         C.ngx_http_lua_ffi_socket_tcp_tlshandshake(r, self[SOCKET_CTX_INDEX],
                                                    session_ptr[0],
@@ -84,6 +94,8 @@ local function tlshandshake(self, options)
                                                    options.verify and 1 or 0,
                                                    options.ocsp_status_req
                                                        and 1 or 0,
+                                                   client_cert,
+                                                   client_priv_key,
                                                    errmsg)
 
     if rc == FFI_NO_REQ_CTX then
