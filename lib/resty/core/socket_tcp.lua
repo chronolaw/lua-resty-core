@@ -14,6 +14,7 @@ local error = error
 local assert = assert
 local getmetatable = getmetatable
 local type = type
+local pcall = pcall
 local select = select
 local co_yield = coroutine._yield
 local table_new = require("table.new")
@@ -172,7 +173,11 @@ do
     local old_socket_tcp = ngx.socket.tcp
 
     function ngx.socket.tcp()
-        local sock = old_socket_tcp()
+        local ok, sock = pcall(old_socket_tcp)
+        if not ok then
+            error(sock, 2)
+        end
+
         local mt = getmetatable(sock)
 
         mt.tlshandshake = tlshandshake
