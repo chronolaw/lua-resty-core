@@ -97,10 +97,10 @@ __DATA__
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP url found: http://127.0.0.1:8888/ocsp?foo=1,
 
 --- no_error_log
@@ -189,10 +189,10 @@ OCSP url found: http://127.0.0.1:8888/ocsp?foo=1,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP responder not found
 
 --- no_error_log
@@ -281,10 +281,10 @@ OCSP responder not found
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to get OCSP responder: no issuer certificate in chain
 
 --- no_error_log
@@ -372,10 +372,10 @@ failed to get OCSP responder: no issuer certificate in chain
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to get OCSP responder: issuer certificate not next to leaf
 
 --- no_error_log
@@ -467,10 +467,10 @@ failed to get OCSP responder: issuer certificate not next to leaf
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP url found: http:/,
 still get an error: truncated
 
@@ -564,10 +564,10 @@ still get an error: truncated
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP request created with length 68
 
 --- no_error_log
@@ -657,10 +657,10 @@ OCSP request created with length 68
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to create OCSP request: output buffer too small: 68 > 67
 
 --- no_error_log
@@ -742,7 +742,7 @@ connected: 1
 failed to do SSL handshake: handshake failed
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to create OCSP request: d2i_X509_bio() failed
 
 --- no_error_log
@@ -831,10 +831,10 @@ failed to create OCSP request: d2i_X509_bio() failed
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to create OCSP request: no issuer certificate in chain
 
 --- no_error_log
@@ -922,10 +922,10 @@ failed to create OCSP request: no issuer certificate in chain
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP response validation ok
 
 --- no_error_log
@@ -1015,10 +1015,10 @@ OCSP response validation ok
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to validate OCSP response: no issuer certificate in chain
 
 --- no_error_log
@@ -1107,10 +1107,10 @@ OCSP response validation ok
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP response validation ok
 
 --- no_error_log
@@ -1202,10 +1202,10 @@ FIXME: we should complain in this case.
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 OCSP response validation ok
 
 --- no_error_log
@@ -1296,10 +1296,10 @@ OCSP response validation ok
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to validate OCSP response: OCSP_basic_verify() failed
 
 --- no_error_log
@@ -1392,7 +1392,7 @@ connected: 1
 failed to do SSL handshake: handshake failed
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 failed to validate OCSP response: certificate status "revoked" in the OCSP response
 
 --- no_error_log
@@ -1472,10 +1472,10 @@ FIXME: check the OCSP staple actually received by the ssl client
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 ocsp status resp set ok: nil,
 
 --- no_error_log
@@ -1554,10 +1554,10 @@ ocsp status resp set ok: nil,
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 ocsp status resp set ok: no status req,
 
 --- no_error_log

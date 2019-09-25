@@ -102,7 +102,7 @@ connected: 1
 failed to do SSL handshake: handshake failed
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 sslv3 alert handshake failure
 
 --- no_error_log
@@ -210,7 +210,7 @@ sslv3 alert handshake failure
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -222,7 +222,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -309,7 +309,7 @@ lua ssl server name: "test.com"
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -321,7 +321,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 read SNI name from Lua: test.com
 
 --- no_error_log
@@ -409,7 +409,7 @@ read SNI name from Lua: test.com
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -525,7 +525,7 @@ read SNI name from Lua: nil, type: nil
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -538,7 +538,7 @@ close: 1 nil
 
 --- error_log eval
 [
-'lua ssl server name: "test.com"',
+'lua tls server name: "test.com"',
 qr/Using unix socket file .*?nginx\.sock/
 ]
 
@@ -646,7 +646,7 @@ qr/Using unix socket file .*?nginx\.sock/
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -658,7 +658,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 Using IPv4 address: 127.0.0.1
 
 --- no_error_log
@@ -765,7 +765,7 @@ Using IPv4 address: 127.0.0.1
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -777,7 +777,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 Using IPv6 address: 0.0.0.1
 
 --- no_error_log
@@ -888,7 +888,7 @@ Using IPv6 address: 0.0.0.1
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -900,7 +900,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -1015,7 +1015,7 @@ lua ssl server name: "test.com"
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -1027,7 +1027,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -1540,7 +1540,7 @@ ssl cert by lua done
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -1552,7 +1552,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -1673,7 +1673,7 @@ lua ssl server name: "test.com"
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -1685,7 +1685,7 @@ received: foo
 close: 1 nil
 
 --- error_log
-lua ssl server name: "test.com"
+lua tls server name: "test.com"
 
 --- no_error_log
 [error]
@@ -2148,7 +2148,7 @@ qr/\[error\] .*? failed to parse pem key: PEM_read_bio_PrivateKey\(\) failed/
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
