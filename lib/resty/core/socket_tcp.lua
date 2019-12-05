@@ -12,7 +12,6 @@ local FFI_NO_REQ_CTX = base.FFI_NO_REQ_CTX
 local get_request = base.get_request
 local error = error
 local assert = assert
-local getmetatable = getmetatable
 local type = type
 local pcall = pcall
 local select = select
@@ -178,12 +177,8 @@ do
             error(sock, 2)
         end
 
-        local mt = getmetatable(sock)
-
-        mt.tlshandshake = tlshandshake
-        mt.sslhandshake = sslhandshake
-
-        ngx.socket.tcp = old_socket_tcp
+        sock.tlshandshake = tlshandshake
+        sock.sslhandshake = sslhandshake
 
         return sock
     end
