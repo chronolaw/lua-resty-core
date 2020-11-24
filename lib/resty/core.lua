@@ -20,7 +20,7 @@ if subsystem == 'http' then
     require "resty.core.phase"
     require "resty.core.ndk"
     require "resty.core.socket"
-    require "resty.core.socket_tcp"
+    require "resty.core.socket.tcp"
 end
 
 
