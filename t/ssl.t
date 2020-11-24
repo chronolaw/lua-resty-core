@@ -2587,7 +2587,7 @@ client certificate subject: nil
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
@@ -2687,7 +2687,7 @@ read server port from Lua: 12345
 GET /t
 --- response_body
 connected: 1
-ssl handshake: userdata
+ssl handshake: cdata
 sent http request: 56 bytes.
 received: HTTP/1.1 201 Created
 received: Server: nginx
