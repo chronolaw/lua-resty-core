@@ -84,8 +84,8 @@ local function sslhandshake(self, reused_session, server_name, ssl_verify,
     session_ptr[0] = type(reused_session) == "cdata" and reused_session or nil
 
     if server_name then
-        server_name_str[0].data = options.server_name
-        server_name_str[0].len = #options.server_name
+        server_name_str[0].data = server_name
+        server_name_str[0].len = #server_name
 
     else
         server_name_str[0].data = nil
