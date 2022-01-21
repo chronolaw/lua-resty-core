@@ -41,9 +41,9 @@ void ngx_http_lua_ffi_ssl_free_session(void *sess);
 ]]
 
 
-local SOCKET_CTX_INDEX = 1
-local SOCKET_CLIENT_CERT_INDEX = 6
-local SOCKET_CLIENT_KEY_INDEX = 7
+local SOCKET_CTX_INDEX          = 1
+local SOCKET_CLIENT_CERT_INDEX  = 6
+local SOCKET_CLIENT_PKEY_INDEX  = 7
 
 
 local errmsg = base.get_errmsg_ptr()
@@ -52,6 +52,25 @@ local server_name_str = ffi.new("ngx_str_t[1]")
 local openssl_error_code = ffi.new("int[1]")
 local cached_options = new_tab(0, 4)
 
+local function setclientcert(cosocket, cert, pkey)
+    if not cert or not pkey then
+        cosocket[SOCKET_CLIENT_CERT_INDEX] = nil
+        cosocket[SOCKET_CLIENT_PRIV_INDEX] = nil
+
+        return
+    end
+
+    if type(cert) ~= "cdata" then
+        error("bad client cert type", 2)
+    end
+
+    if type(pkey) ~= "cdata" then
+        error("bad client pkey type", 2)
+    end
+
+    cosocket[SOCKET_CLIENT_CERT_INDEX] = cert
+    cosocket[SOCKET_CLIENT_PRIV_INDEX] = pkey
+end
 
 local function tlshandshake(self, options)
     if not options then
@@ -181,8 +200,8 @@ do
             error(sock, 2)
         end
 
-        sock.tlshandshake = tlshandshake
-        sock.sslhandshake = sslhandshake
+        sock.setclientcert = setclientcert
+        sock.sslhandshake  = sslhandshake
 
         return sock
     end
