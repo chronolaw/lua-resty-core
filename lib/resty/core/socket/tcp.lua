@@ -14,7 +14,6 @@ local FFI_OK = base.FFI_OK
 local FFI_AGAIN = base.FFI_AGAIN
 local FFI_NO_REQ_CTX = base.FFI_NO_REQ_CTX
 local get_request = base.get_request
-local clear_tab = base.clear_tab
 local error = error
 local assert = assert
 local type = type
