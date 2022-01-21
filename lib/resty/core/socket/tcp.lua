@@ -28,20 +28,22 @@ ffi.cdef[[
 typedef struct ngx_http_lua_socket_tcp_upstream_s
     ngx_http_lua_socket_tcp_upstream_t;
 
-int ngx_http_lua_ffi_socket_tcp_tlshandshake(ngx_http_request_t *r,
+int ngx_http_lua_ffi_socket_tcp_sslhandshake(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, void *sess,
     int enable_session_reuse, ngx_str_t *server_name, int verify,
     int ocsp_status_req, void *chain, void *pkey, char **errmsg);
 
-int ngx_http_lua_ffi_socket_tcp_get_tlshandshake_result(ngx_http_request_t *r,
+int ngx_http_lua_ffi_socket_tcp_get_sslhandshake_result(ngx_http_request_t *r,
     ngx_http_lua_socket_tcp_upstream_t *u, void **sess, char **errmsg,
     int *openssl_error_code);
 
-void ngx_http_lua_ffi_tls_free_session(void *sess);
+void ngx_http_lua_ffi_ssl_free_session(void *sess);
 ]]
 
 
 local SOCKET_CTX_INDEX = 1
+local SOCKET_CLIENT_CERT_INDEX = 6
+local SOCKET_CLIENT_KEY_INDEX = 7
 
 
 local errmsg = base.get_errmsg_ptr()
