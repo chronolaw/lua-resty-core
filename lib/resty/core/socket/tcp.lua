@@ -14,7 +14,6 @@ local FFI_OK = base.FFI_OK
 local FFI_AGAIN = base.FFI_AGAIN
 local FFI_NO_REQ_CTX = base.FFI_NO_REQ_CTX
 local get_request = base.get_request
-local new_tab = base.new_tab
 local clear_tab = base.clear_tab
 local error = error
 local assert = assert
@@ -50,12 +49,11 @@ local errmsg = base.get_errmsg_ptr()
 local session_ptr = ffi.new("void *[1]")
 local server_name_str = ffi.new("ngx_str_t[1]")
 local openssl_error_code = ffi.new("int[1]")
-local cached_options = new_tab(0, 4)
 
 local function setclientcert(self, cert, pkey)
     if not cert or not pkey then
         self[SOCKET_CLIENT_CERT_INDEX] = nil
-        self[SOCKET_CLIENT_PRIV_INDEX] = nil
+        self[SOCKET_CLIENT_PKEY_INDEX] = nil
         return
     end
 
@@ -68,16 +66,17 @@ local function setclientcert(self, cert, pkey)
     end
 
     self[SOCKET_CLIENT_CERT_INDEX] = cert
-    self[SOCKET_CLIENT_PRIV_INDEX] = pkey
+    self[SOCKET_CLIENT_PKEY_INDEX] = pkey
 end
 
-local function tlshandshake(self, options)
-    if not options then
-        clear_tab(cached_options)
-        options = cached_options
 
-    elseif type(options) ~= "table" then
-        error("bad options arg: table expected", 2)
+local function sslhandshake(self, reused_session, server_name, ssl_verify,
+    send_status_req, ...)
+
+    local n = select("#", ...)
+    if not self or n > 1 then
+        error("ngx.socket sslhandshake: expecting 1 ~ 5 arguments " ..
+              "(including the object), but seen " .. (self and 5 + n or 0))
     end
 
     local r = get_request()
@@ -85,10 +84,9 @@ local function tlshandshake(self, options)
         error("no request found", 2)
     end
 
-    local reused_session = options.reused_session
     session_ptr[0] = type(reused_session) == "cdata" and reused_session or nil
 
-    if options.server_name then
+    if server_name then
         server_name_str[0].data = options.server_name
         server_name_str[0].len = #options.server_name
 
@@ -97,31 +95,16 @@ local function tlshandshake(self, options)
         server_name_str[0].len = 0
     end
 
-    local client_cert = options.client_cert
-    local client_pkey = options.client_priv_key
-    if client_cert then
-        if not client_pkey then
-            error("client certificate supplied without corresponding " ..
-                  "private key", 2)
-        end
+    local u           = self[SOCKET_CTX_INDEX]
+    local client_cert = self[SOCKET_CLIENT_CERT_INDEX]
+    local client_pkey = self[SOCKET_CLIENT_PKEY_INDEX]
 
-        if type(client_cert) ~= "cdata" then
-            error("bad client_cert option type", 2)
-        end
-
-        if type(client_pkey) ~= "cdata" then
-            error("bad client_priv_key option type", 2)
-        end
-    end
-
-    local u = self[SOCKET_CTX_INDEX]
-
-    local rc = C.ngx_http_lua_ffi_socket_tcp_tlshandshake(r, u,
+    local rc = C.ngx_http_lua_ffi_socket_tcp_sslhandshake(r, u,
                    session_ptr[0],
                    reused_session ~= false,
                    server_name_str,
-                   options.verify and 1 or 0,
-                   options.ocsp_status_req and 1 or 0,
+                   ssl_verify and 1 or 0,
+                   send_status_req and 1 or 0,
                    client_cert, client_pkey, errmsg)
 
     if rc == FFI_NO_REQ_CTX then
@@ -146,7 +129,7 @@ local function tlshandshake(self, options)
                 return true
             end
 
-            rc = C.ngx_http_lua_ffi_socket_tcp_get_tlshandshake_result(r, u,
+            rc = C.ngx_http_lua_ffi_socket_tcp_get_sslhandshake_result(r, u,
                      session_ptr, errmsg, openssl_error_code)
 
             assert(rc == FFI_OK)
@@ -155,67 +138,16 @@ local function tlshandshake(self, options)
                 return nil
             end
 
-            return ffi_gc(session_ptr[0], C.ngx_http_lua_ffi_tls_free_session)
+            return ffi_gc(session_ptr[0], C.ngx_http_lua_ffi_ssl_free_session)
         end
 
         assert(rc == FFI_AGAIN)
 
         co_yield()
 
-        rc = C.ngx_http_lua_ffi_socket_tcp_get_tlshandshake_result(r, u,
+        rc = C.ngx_http_lua_ffi_socket_tcp_get_sslhandshake_result(r, u,
                  session_ptr, errmsg, openssl_error_code)
     end
-end
-
-
-local function sslhandshake(self, reused_session, server_name, ssl_verify,
-    send_status_req, ...)
-
-    local n = select("#", ...)
-    if not self or n > 1 then
-        error("ngx.socket sslhandshake: expecting 1 ~ 5 arguments " ..
-              "(including the object), but seen " .. (self and 5 + n or 0))
-    end
-
-    cached_options.reused_session = reused_session
-    cached_options.server_name = server_name
-    cached_options.verify = ssl_verify
-    cached_options.ocsp_status_req = send_status_req
-
-    local r = get_request()
-    if not r then
-        error("no request found", 2)
-    end
-
-    session_ptr[0] = type(reused_session) == "cdata" and reused_session or nil
-
-    if server_name then
-        server_name_str[0].data = options.server_name
-        server_name_str[0].len = #options.server_name
-
-    else
-        server_name_str[0].data = nil
-        server_name_str[0].len = 0
-    end
-
-    local client_cert = options.client_cert
-    local client_pkey = options.client_priv_key
-    if client_cert then
-        if not client_pkey then
-            error("client certificate supplied without corresponding " ..
-                  "private key", 2)
-        end
-
-        if type(client_cert) ~= "cdata" then
-            error("bad client_cert option type", 2)
-        end
-
-        if type(client_pkey) ~= "cdata" then
-            error("bad client_priv_key option type", 2)
-        end
-    end
-
-    return res, err
 end
 
 
