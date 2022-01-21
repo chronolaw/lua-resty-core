@@ -52,11 +52,10 @@ local server_name_str = ffi.new("ngx_str_t[1]")
 local openssl_error_code = ffi.new("int[1]")
 local cached_options = new_tab(0, 4)
 
-local function setclientcert(cosocket, cert, pkey)
+local function setclientcert(self, cert, pkey)
     if not cert or not pkey then
-        cosocket[SOCKET_CLIENT_CERT_INDEX] = nil
-        cosocket[SOCKET_CLIENT_PRIV_INDEX] = nil
-
+        self[SOCKET_CLIENT_CERT_INDEX] = nil
+        self[SOCKET_CLIENT_PRIV_INDEX] = nil
         return
     end
 
@@ -68,8 +67,8 @@ local function setclientcert(cosocket, cert, pkey)
         error("bad client pkey type", 2)
     end
 
-    cosocket[SOCKET_CLIENT_CERT_INDEX] = cert
-    cosocket[SOCKET_CLIENT_PRIV_INDEX] = pkey
+    self[SOCKET_CLIENT_CERT_INDEX] = cert
+    self[SOCKET_CLIENT_PRIV_INDEX] = pkey
 end
 
 local function tlshandshake(self, options)
@@ -183,9 +182,38 @@ local function sslhandshake(self, reused_session, server_name, ssl_verify,
     cached_options.verify = ssl_verify
     cached_options.ocsp_status_req = send_status_req
 
-    local res, err = tlshandshake(self, cached_options)
+    local r = get_request()
+    if not r then
+        error("no request found", 2)
+    end
 
-    clear_tab(cached_options)
+    session_ptr[0] = type(reused_session) == "cdata" and reused_session or nil
+
+    if server_name then
+        server_name_str[0].data = options.server_name
+        server_name_str[0].len = #options.server_name
+
+    else
+        server_name_str[0].data = nil
+        server_name_str[0].len = 0
+    end
+
+    local client_cert = options.client_cert
+    local client_pkey = options.client_priv_key
+    if client_cert then
+        if not client_pkey then
+            error("client certificate supplied without corresponding " ..
+                  "private key", 2)
+        end
+
+        if type(client_cert) ~= "cdata" then
+            error("bad client_cert option type", 2)
+        end
+
+        if type(client_pkey) ~= "cdata" then
+            error("bad client_priv_key option type", 2)
+        end
+    end
 
     return res, err
 end
