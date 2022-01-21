@@ -39,9 +39,7 @@ void ngx_http_lua_ffi_ssl_free_session(void *sess);
 ]]
 
 
-local SOCKET_CTX_INDEX          = 1
-local SOCKET_CLIENT_CERT_INDEX  = 6
-local SOCKET_CLIENT_PKEY_INDEX  = 7
+local SOCKET_CTX_INDEX = 1
 
 
 local errmsg = base.get_errmsg_ptr()
@@ -51,8 +49,8 @@ local openssl_error_code = ffi.new("int[1]")
 
 local function setclientcert(self, cert, pkey)
     if not cert or not pkey then
-        self[SOCKET_CLIENT_CERT_INDEX] = nil
-        self[SOCKET_CLIENT_PKEY_INDEX] = nil
+        self.client_cert = nil
+        self.client_pkey = nil
         return
     end
 
@@ -64,8 +62,8 @@ local function setclientcert(self, cert, pkey)
         error("bad client pkey type", 2)
     end
 
-    self[SOCKET_CLIENT_CERT_INDEX] = cert
-    self[SOCKET_CLIENT_PKEY_INDEX] = pkey
+    self.client_cert = cert
+    self.client_pkey = pkey
 end
 
 
@@ -94,9 +92,7 @@ local function sslhandshake(self, reused_session, server_name, ssl_verify,
         server_name_str[0].len = 0
     end
 
-    local u           = self[SOCKET_CTX_INDEX]
-    local client_cert = self[SOCKET_CLIENT_CERT_INDEX]
-    local client_pkey = self[SOCKET_CLIENT_PKEY_INDEX]
+    local u = self[SOCKET_CTX_INDEX]
 
     local rc = C.ngx_http_lua_ffi_socket_tcp_sslhandshake(r, u,
                    session_ptr[0],
@@ -104,7 +100,7 @@ local function sslhandshake(self, reused_session, server_name, ssl_verify,
                    server_name_str,
                    ssl_verify and 1 or 0,
                    send_status_req and 1 or 0,
-                   client_cert, client_pkey, errmsg)
+                   self.client_cert, self.client_pkey, errmsg)
 
     if rc == FFI_NO_REQ_CTX then
         error("no request ctx found", 2)
