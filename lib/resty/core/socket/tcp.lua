@@ -48,10 +48,15 @@ local server_name_str = ffi.new("ngx_str_t[1]")
 local openssl_error_code = ffi.new("int[1]")
 
 local function setclientcert(self, cert, pkey)
-    if not cert or not pkey then
+    if not cert and not pkey then
         self.client_cert = nil
         self.client_pkey = nil
         return
+    end
+
+    if not cert or not pkey then
+        error("client certificate must be supplied with corresponding " ..
+              "private key", 2)
     end
 
     if type(cert) ~= "cdata" then
